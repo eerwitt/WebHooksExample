@@ -13,5 +13,5 @@
     "mocha": "1.6.0",
     "should": "1.2.0"
   },
-  "engine": "node = 0.8.12"
+  "engine": "node = 0.8.15"
 }
