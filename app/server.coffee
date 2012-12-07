@@ -16,24 +16,47 @@ server.get "/webhook/register.json[p]?", (req, res) ->
     return
 
   # Check if I can reach the URL
-  console.log "Grabbing client callback URL " + clientCallbackURL
-  parsedClientCallbackURL = url.parse clientCallbackURL
+  clientHash = crypto.createHash('sha1').update(clientCallbackURL).digest("hex")
+  console.log "Grabbing client callback URL " + clientCallbackURL + " with a challenge of " + clientHash
+  parsedClientCallbackURL = url.parse clientCallbackURL, true
 
-  console.log parsedClientCallbackURL
-  http.request({host: parsedClientCallbackURL.host, path: parsedClientCallbackURL.path, method: "GET"}, (clientResponse) ->
-    console.log "Test"
-    console.log clientResponse
+  query = parsedClientCallbackURL.query
+  query.challenge = clientHash
 
-    clientHash = crypto.createHash('sha1').update(clientCallbackURL).digest("hex")
-    console.log "Registered " + clientCallbackURL + " as client " + clientHash
+  params = []
+  for k, v of query
+    params.push [k, v].join "="
 
-    response =
-      challenge: clientHash
-      verifyToken: verifyToken
-      callbackURL: clientCallbackURL
+  adjustedPath = parsedClientCallbackURL.pathname + "?" + params.join("&")
+  console.log "Using adjusted path of " + adjustedPath
 
-    res.jsonp response
-  ).on "error", (error) ->
+  httpRequest = http.request host: parsedClientCallbackURL.host, path: adjustedPath, method: "GET", (clientResponse) ->
+    responseData = null
+    clientResponse.on "data", (chunk) ->
+      responseData << chunk
+
+    clientResponse.on "close", ->
+      console.log "Connection closed by peer"
+      res.jsonp
+        error: "Connection closed by peer"
+
+    clientResponse.on "end", ->
+      console.log responseData
+
+      if responseData is clientHash
+        console.log "Registered " + clientCallbackURL + " as client " + clientHash
+
+        response =
+          challenge: clientHash
+          verifyToken: verifyToken
+          callbackURL: clientCallbackURL
+
+        res.jsonp response
+      else
+        res.jsonp
+          error: "Expected a challenge to be echo'd back"
+
+  httpRequest.on "error", (error) ->
     res.jsonp
       error: error.message
 
