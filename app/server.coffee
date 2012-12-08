@@ -9,6 +9,8 @@ server.use express.bodyParser()
 Client = require './models/client'
 
 # Used to register URLs to ping back when updates have occured.
+#  Doing it as a get as an example, should be a post
+#  If you change the .get to .post then just query with a curl -F 'clientCallbackURL=<your URL>' -F 'verifyToken=123' http://localhost:8000/webhook/register.json
 server.get "/webhook/register.json[p]?", (req, res) ->
   clientCallbackURL = req.query.clientCallbackURL
   verifyToken = req.query.verifyToken
