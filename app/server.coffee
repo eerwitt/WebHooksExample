@@ -1,17 +1,12 @@
-mongoose = require 'mongoose'
 express = require 'express'
 crypto = require 'crypto'
 http = require 'http'
 url = require 'url'
 
 server = express()
+server.use express.bodyParser()
 
-mongoose.connect "mongodb://localhost/webhooker"
-
-Client = mongoose.model 'Client', mongoose.Schema
-  url: String
-  challenge: String
-  verifyToken: String
+Client = require './models/client'
 
 # Used to register URLs to ping back when updates have occured.
 server.get "/webhook/register.json[p]?", (req, res) ->
@@ -96,9 +91,15 @@ server.get "/webhook/clients.json", (req, res) ->
 # An example client responding to webhooks
 server.get "/webhook/exampleClient", (req, res) ->
   challenge = req.query.challenge
-  return res.send challenge if challenge?
 
-  res.send req.query.update
+  if challenge?
+    res.send challenge
+  else
+    res.send "No challenge sent in"
+
+server.post "/webhook/exampleClient", (req, res) ->
+  console.log "Update came in"
+  res.send "Update found"
 
 server.listen 8000
 console.log "Ready for requests"
