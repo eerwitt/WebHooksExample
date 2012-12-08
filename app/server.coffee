@@ -34,13 +34,10 @@ server.get "/webhook/register.json[p]?", (req, res) ->
   parsedURL = parsedClientCallbackURL.protocol + "//" + parsedClientCallbackURL.host + adjustedPath
   console.log "Using URL of " + parsedURL
 
-  httpRequest = http.get parsedClientCallbackURL.protocol + "//" + parsedClientCallbackURL.host + adjustedPath, (clientResponse) ->
-    console.log clientResponse
-
+  httpRequest = http.get parsedURL, (clientResponse) ->
     responseData = []
     clientResponse.on "data", (chunk) ->
       responseData.push chunk
-      console.log chunk
 
     clientResponse.on "close", ->
       console.log "Connection closed by peer"
