@@ -19,7 +19,6 @@ Uses node and coffeescript.
 
 	npm install
 	coffee app/server
-
 ```
 
 ## Registering a Client
@@ -38,7 +37,6 @@ For example.
   		"verifyToken": "123",
   		"callbackURL": "http://localhost:8000/webhook/exampleClient"
 	}
-
 ```
 
 This will make a request to the callback URL expecting it to echo the requested challenge.
@@ -48,7 +46,6 @@ This will make a request to the callback URL expecting it to echo the requested 
 ```bash
 
 	curl http://localhost:8000/webhook/clients.json
-	
 ```
 
 ## Send Updates
@@ -58,5 +55,4 @@ Now that there are clients available you can send updates to each one.
 ```bash
 
 	coffee app/sendUpdates
-
 ```
