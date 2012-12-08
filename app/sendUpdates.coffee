@@ -22,31 +22,32 @@ Client.find {}, (error, docs) ->
       updateMark: "123"
       id: "2534"
 
-    clientURL = url.parse rawClientURL
     console.log "Posting to " + rawClientURL
-
-    requestOptions =
-      host: clientURL.hostname
-      port: clientURL.port
-      path: clientURL.path
-      method: 'POST'
-      headers:
-        'Content-Type': 'application/x-www-form-urlencoded'
-        'Content-Length': postData.length
-
-    httpRequest = http.request requestOptions, (res) ->
-      res.setEncoding 'utf8'
-      console.log "Got response"
-
-      postResponse = []
-      res.on 'data', (chunk) ->
-        postResponse.push chunk
-
-      res.on 'end', ->
-        console.log "Had response of " + postResponse.join("")
-
-    httpRequest.on "error", (error) ->
-      console.log "Error returned from request " + error
-
-    httpRequest.write querystring.stringify(postData)
-    httpRequest.end()
+    request.post rawClientURL, form: postData, (error, response, body) ->
+      console.log error, response, body
+    
+#    requestOptions =
+#      host: clientURL.hostname
+#      port: clientURL.port
+#      path: clientURL.path
+#      method: 'POST'
+#      headers:
+#        'Content-Type': 'application/x-www-form-urlencoded'
+#        'Content-Length': postData.length
+#
+#    httpRequest = http.request requestOptions, (res) ->
+#      res.setEncoding 'utf8'
+#      console.log "Got response"
+#
+#      postResponse = []
+#      res.on 'data', (chunk) ->
+#        postResponse.push chunk
+#
+#      res.on 'end', ->
+#        console.log "Had response of " + postResponse.join("")
+#
+#    httpRequest.on "error", (error) ->
+#      console.log "Error returned from request " + error
+#
+#    httpRequest.write querystring.stringify(postData)
+#    httpRequest.end()
